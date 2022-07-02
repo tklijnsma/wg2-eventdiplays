@@ -52,8 +52,9 @@ def zprime_3d_pdata(event):
     for p in particles: p.is_stable_hadron = False
     for p in particles:
         if abs(p.pid) in {51, 53}:
-            p.parents[0].is_stable_hadron = True
-            p.parents[0].is_leaf = True
+            for parent in p.parents:
+                parent.is_stable_hadron = True
+                parent.is_leaf = True
     particles = [p for p in particles if abs(p.pid) not in {51, 53}]
 
     # Fix the depth of the particles so that child.depth > parent.depth
@@ -137,7 +138,7 @@ def zprime_3d_pdata(event):
 
 def dump_fig(outfile, fig, mode='w'):
     fig_html = fig.to_html(full_html=False, include_plotlyjs='cdn')
-    print('Writing to', outfile)
+    print(f'Writing to {outfile}, {mode=}')
     outdir = osp.dirname(osp.abspath(outfile))
     if not osp.isdir(outdir): os.makedirs(outdir)
     with open(outfile, mode) as f:
@@ -166,7 +167,7 @@ def eventdisplay_3d():
                         # aspectmode='cube'
                         )
                     )
-                dump_fig(f'plots/probvec{probvec}_3d_{i//5}.html', fig, mode='w' if i==0 else 'a')
+                dump_fig(f'plots/probvec{probvec}_3d_{i//5}.html', fig, mode='w' if i%5==0 else 'a')
             except Exception as e:
                 print(f'Failed for event {i}; Error:\n{e}')
 
